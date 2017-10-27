@@ -684,18 +684,19 @@ namespace CNTK
         /// assign the specified value to each element of the view.
         ///
         template <typename ElementType>
-        explicit NDArrayView(const ElementType& value, const NDShape& viewShape = { 1 }, const DeviceDescriptor& device = DeviceDescriptor::UseDefaultDevice(), bool readOnly = false)
+        explicit NDArrayView(const ElementType& value, const NDShape& viewShape = { 1 }, const DeviceDescriptor& device = DeviceDescriptor::UseDefaultDevice(), bool readOnly = false, bool isSliceView = false)
             : NDArrayView(AsDataType<ElementType>(), viewShape, device)
         {
             SetValue(value);
             m_isReadOnly = readOnly;
+            m_isSliceView = isSliceView;
         }
 
         ///
         /// Construct a NDArrayView over newly allocated dense storage on the specified device and assign the specified value to each element of the view.
         /// The specified value is cast to the specified DataType.
         ///
-        explicit NDArrayView(double value, DataType dataType = DataType::Float, const NDShape& viewShape = { 1 }, const DeviceDescriptor& device = DeviceDescriptor::UseDefaultDevice(), bool readOnly = false)
+        explicit NDArrayView(double value, DataType dataType = DataType::Float, const NDShape& viewShape = { 1 }, const DeviceDescriptor& device = DeviceDescriptor::UseDefaultDevice(), bool readOnly = false, bool isSliceView = false)
             : NDArrayView(dataType, viewShape, device)
         {
             switch (m_dataType)
@@ -712,6 +713,7 @@ namespace CNTK
             }
 
             m_isReadOnly = readOnly;
+            m_isSliceView = isSliceView;
         }
 
         ///
@@ -783,6 +785,11 @@ namespace CNTK
         /// Returns a boolean indicating if 'this' view is read-only.
         ///
         bool IsReadOnly() const { return m_isReadOnly; }
+
+        ///
+        /// Returns a boolean indicating if 'this' view is slice.
+        ///
+        bool IsSliceView() const { return m_isSliceView; }
 
         // TODO: The set methods should be offered in template from
         ///
@@ -897,6 +904,7 @@ namespace CNTK
         ::CNTK::StorageFormat m_storageFormat;
         NDShape m_viewShape;
         bool m_isReadOnly;
+        bool m_isSliceView;
 
         std::shared_ptr<void> m_tensorView; // Microsoft::MSR::CNTK::TensorView<ElemType>*
     };
